@@ -11,52 +11,110 @@
 :root{
   --bg:#0f1218; --panel:#161a23; --line:#ffffff12; --zebra:#ffffff06;
   --text:#e7e2d6; --muted:#8d96a8; --dim:#5d6577; --accent:#e3b04b;
-  --sell:#f3d27a; --buy:#7fd4ff; --deal:#c9b8ff; --ok:#2f6b3a;
-  --q1:#ece8de; --q2:#4fe04f; --q3:#4a9cf0; --q4:#c27cf5; --q5:#ff9a3c;
+  --sell:#f3d27a; --buy:#7fd4ff; --deal:#c9b8ff;
+  --q0:#9d9d9d; --q1:#ece8de; --q2:#4fe04f; --q3:#4a9cf0; --q4:#c27cf5; --q5:#ff9a3c;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--bg)}
 body{min-height:100vh;background:radial-gradient(1200px 520px at 0 0,#1f2433 0,var(--bg) 60%) no-repeat,var(--bg);
   color:var(--text);font:16px/1.4 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
-.wrap{max-width:980px;margin:0 auto;padding:28px 16px 40px}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 16px 40px}
 header{display:flex;align-items:center;gap:16px;border-bottom:2px solid #e3b04b55;padding-bottom:18px}
 .ico{font-size:44px;line-height:1}
 h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(28px,6vw,42px);color:var(--accent);line-height:1.1}
 .sub{color:var(--muted);font-size:15px;margin-top:4px}
-.tools{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 85%,transparent);padding:14px 0 10px;margin-top:4px}
-.search{position:relative}
-.search input{width:100%;font:inherit;font-size:18px;color:var(--text);background:var(--panel);border:1px solid #ffffff1f;
-  border-radius:12px;padding:13px 44px 13px 46px;outline:none}
+
+/* раскладка как на аукционе: категории слева, фильтры и таблица справа */
+.ah{display:grid;grid-template-columns:240px minmax(0,1fr);gap:22px;margin-top:18px;align-items:start}
+.ah main{min-width:0}
+.side{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;background:var(--panel);border:1px solid #ffffff14;
+  border-radius:12px;padding:8px;scrollbar-width:thin}
+.side h2{font-size:12px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:1.2px;padding:6px 8px 8px}
+.cat{display:flex;width:100%;align-items:center;gap:6px;text-align:left;background:none;border:0;border-radius:7px;
+  padding:6px 8px;cursor:pointer;color:var(--sell);font-size:15px}
+.cat:hover{background:#ffffff0c}
+.cat .n{margin-left:auto;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.cat.l1{padding-left:24px;color:var(--text);font-size:14px}
+.cat.l2{padding-left:40px;color:var(--muted);font-size:14px}
+.cat.on{background:#e3b04b26;color:#ffe9a8}
+.cat.l1.on,.cat.l2.on{color:#ffe9a8}
+.cat .pm{width:12px;color:var(--dim);font-size:12px;flex:none}
+.catBtn{display:none}
+
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.f{display:flex;flex-direction:column;gap:4px}
+.f label{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.search{position:relative;flex:1 1 260px}
+.search input{width:100%;font-size:17px;background:var(--panel);border:1px solid #ffffff1f;border-radius:10px;padding:10px 40px 10px 42px;outline:none}
 .search input::-webkit-search-cancel-button{display:none}
-.search input:focus{border-color:#e3b04b99;box-shadow:0 0 0 3px #e3b04b22}
-.search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);opacity:.55}
-.search button{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);
+.search input:focus,.lvlin input:focus,select:focus{border-color:#e3b04b99;box-shadow:0 0 0 3px #e3b04b22;outline:none}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.55}
+.search button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);
   font-size:22px;width:32px;height:32px;cursor:pointer;border-radius:8px;display:none}
 .search.has button{display:block}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;font:inherit;font-size:14px;color:var(--muted);background:#ffffff0a;border:1px solid #ffffff14;border-radius:999px;
-  padding:6px 13px;cursor:pointer;white-space:nowrap}
-.chip b{font-weight:600;color:var(--dim);margin-left:4px}
-.chip.on{color:#0f1218;background:var(--accent);border-color:var(--accent)}
-.chip.on b{color:#0f121899}
-.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:8px}
-.row2 select,.row2 .chip{font:inherit;font-size:14px}
-select{color:var(--text);background:#ffffff0a;border:1px solid #ffffff14;border-radius:999px;padding:6px 10px;cursor:pointer}
+.lvlin{display:flex;align-items:center;gap:6px}
+.lvlin input{width:62px;background:var(--panel);border:1px solid #ffffff1f;border-radius:10px;padding:9px 8px;text-align:center}
+.lvlin span{color:var(--dim)}
+select{background:var(--panel);border:1px solid #ffffff1f;border-radius:10px;padding:9px 10px;cursor:pointer}
 select option{background:#161a23}
-.count{margin-left:auto;color:var(--dim);font-size:14px}
-.list{margin-top:6px}
-.item{border-top:1px solid var(--line)}
+.tog{background:var(--panel);border:1px solid #ffffff1f;border-radius:10px;padding:9px 12px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.tog.on{background:#7fd4ff22;border-color:#7fd4ff88;color:var(--buy)}
+.reset{background:none;border:0;color:var(--dim);cursor:pointer;padding:9px 4px;text-decoration:underline;text-underline-offset:3px}
+.reset:hover{color:var(--accent)}
+.crumbs{margin:14px 0 4px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.crumbs b{color:var(--text);font-weight:600}
+
+/* таблица */
+.cols,.head{display:grid;grid-template-columns:minmax(0,1fr) 64px 160px 140px 92px;gap:10px;align-items:center}
+.cols{padding:8px 10px;border-bottom:1px solid #ffffff1f;position:sticky;top:0;background:var(--bg);z-index:4}
+.cols button{background:none;border:0;cursor:pointer;color:var(--dim);font-size:12px;font-weight:600;text-transform:uppercase;
+  letter-spacing:1.1px;text-align:left;padding:4px 0;white-space:nowrap}
+.cols button:hover{color:var(--text)}
+.cols button.on{color:var(--accent)}
+.cols button.r{text-align:right}
+.cols button.c{text-align:center}
+.cols button.on::after{content:" ▼";font-size:10px}
+.cols button.on.asc::after{content:" ▲"}
+.item{border-bottom:1px solid var(--line)}
 .item:nth-child(even) .head{background:var(--zebra)}
-.head{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:12px 10px;cursor:pointer}
+.head{padding:9px 10px;cursor:pointer}
 .head:hover{background:#ffffff0c!important}
-.lv{display:inline-block;min-width:42px;text-align:center;font-size:15px;font-weight:700;color:#cfd6e4;background:#ffffff12;
-  border-radius:8px;padding:3px 6px}
-.lv.none{background:none;color:var(--dim)}
 .nm{display:flex;align-items:center;gap:12px;min-width:0}
 .icon{flex:none;width:40px;height:40px;border-radius:6px;border:2px solid #4a4a52;box-shadow:0 0 0 1px #000;background:#000}
 .icon.iq0{border-color:#9d9d9d66}.icon.iq2{border-color:#1eff0099}.icon.iq3{border-color:#0070ddcc}
 .icon.iq4{border-color:#a335eecc}.icon.iq5{border-color:#ff8000cc}
+.name{font-size:17px;line-height:1.25}
+.name a{color:var(--dim);text-decoration:none;font-size:13px;margin-left:6px}
+.name a:hover{color:var(--accent)}
+.meta{font-size:13px;color:var(--muted);margin-top:1px}
+.q0{color:var(--q0)}.q1{color:var(--q1)}.q2{color:var(--q2)}.q3{color:var(--q3)}.q4{color:var(--q4)}.q5{color:var(--q5)}
+.lvc{text-align:center}
+.lv{display:inline-block;min-width:38px;text-align:center;font-size:14px;font-weight:700;color:#cfd6e4;background:#ffffff12;border-radius:7px;padding:2px 6px}
+.lv.none{background:none;color:var(--dim)}
+.pc{text-align:right;white-space:nowrap}
+.p{font-weight:700;font-size:16px;color:var(--sell)}
+.p.buy{color:var(--buy)}.p.deal{color:var(--deal);font-size:13px;font-weight:600}
+.p small{font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.7px;opacity:.75;margin-right:4px}
+.p .n{font-weight:500;font-size:12px;color:var(--muted);margin-left:3px}
+.u{font-weight:500;font-size:12px;color:var(--muted);margin-left:4px}
+.none-p{color:var(--dim)}
+.when{color:var(--dim);font-size:13px;text-align:right;white-space:nowrap}
+.mlabel{display:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;opacity:.75}
+.dash{color:var(--muted);margin:0 3px;font-weight:400}
+i.c{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:3px;vertical-align:0}
+i.g{background:radial-gradient(circle at 35% 35%,#fff3b0,#e0a92e 55%,#8a5a12)}
+i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
+.more{display:none;padding:4px 10px 14px 62px}
+.item.open .more{display:block}
+.more table{border-collapse:collapse;width:100%;max-width:560px}
+.more td{padding:6px 10px 6px 0;font-size:15px;border-top:1px solid var(--line);white-space:nowrap}
+.more td:nth-child(2){text-align:right;font-weight:700}
+.more td.who{color:var(--text);white-space:normal}
+.more td.dt{color:var(--dim);font-size:13px}
+.side-sell{color:var(--sell)}.side-buy{color:var(--buy)}.side-deal{color:var(--deal)}
+.empty{padding:40px 10px;color:var(--muted);text-align:center}
+
 /* подсказка как в игре */
 #tip{position:fixed;z-index:50;pointer-events:none;display:none}
 .tt{display:flex;gap:6px;align-items:flex-start;max-width:400px}
@@ -70,46 +128,37 @@ select option{background:#161a23}
 .tt .src{color:#7f8494;font-size:12px;margin-top:6px}
 .tt-inline{display:none;margin:4px 0 12px}
 @media (hover:none){.tt-inline{display:block}}
-.name{font-size:19px;line-height:1.25}
-.name a{color:var(--dim);text-decoration:none;font-size:14px;margin-left:6px}
-.name a:hover{color:var(--accent)}
-.meta{font-size:14px;color:var(--muted);margin-top:2px}
-.q1{color:var(--q1)}.q2{color:var(--q2)}.q3{color:var(--q3)}.q4{color:var(--q4)}.q5{color:var(--q5)}
-.prices{text-align:right;white-space:nowrap}
-.p{font-weight:700;font-size:18px;color:var(--sell)}
-.p.buy{color:var(--buy);font-size:16px}.p.deal{color:var(--deal);font-size:16px}
-.p small{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.7px;opacity:.75;margin-right:5px}
-.p .n{font-weight:500;font-size:13px;color:var(--muted);margin-left:3px}
-.p .u,.more .u{font-weight:500;font-size:13px;color:var(--muted);margin-left:4px}
-.dash{color:var(--muted);margin:0 3px;font-weight:400}
-i.c{display:inline-block;width:12px;height:12px;border-radius:50%;margin-left:3px;vertical-align:0}
-i.g{background:radial-gradient(circle at 35% 35%,#fff3b0,#e0a92e 55%,#8a5a12)}
-i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
-.more{display:none;padding:2px 10px 14px 74px}
-.item.open .more{display:block}
-.more table{border-collapse:collapse;width:100%;max-width:560px}
-.more td{padding:6px 10px 6px 0;font-size:15px;border-top:1px solid var(--line);white-space:nowrap}
-.more td:nth-child(2){text-align:right;font-weight:700}
-.more td.who{color:var(--text);white-space:normal}
-.more td.when{color:var(--dim);font-size:13px}
-.side-sell{color:var(--sell)}.side-buy{color:var(--buy)}.side-deal{color:var(--deal)}
-.empty{padding:40px 10px;color:var(--muted);text-align:center}
+
 .note{margin-top:26px;font-size:14px;color:var(--muted);line-height:1.5;background:#ffffff06;border:1px solid #ffffff12;border-radius:10px;padding:12px 14px}
 .foot{margin-top:14px;font-size:13px;color:var(--dim)}
+
+@media (max-width:900px){
+  .ah{grid-template-columns:1fr;gap:12px}
+  .side{position:static;max-height:none;display:none}
+  .side.open{display:block}
+  .catBtn{display:flex;width:100%;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid #ffffff1f;
+    border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--sell)}
+  .catBtn span{color:var(--dim);font-size:13px}
+}
 @media (max-width:640px){
   .wrap{padding:20px 16px 32px}
   .ico{font-size:36px}
-  .head{grid-template-columns:44px 1fr;gap:4px 10px;padding:11px 4px}
-  .head .prices{grid-column:2;text-align:left}
-  .lv{min-width:36px;font-size:14px}
+  html,body{overflow-x:hidden}
+  .cols{display:flex;flex-wrap:wrap;gap:2px 14px;position:static}
+  .cols button.r,.cols button.c{text-align:left}
+  .head{grid-template-columns:46px minmax(0,1fr);gap:4px 10px;padding:11px 4px}
+  .head .nm{grid-column:1 / -1}
+  .head .lvc{grid-column:1;grid-row:2 / span 2;text-align:left;align-self:start}
+  .head .pc.sellc{grid-column:2;grid-row:2;text-align:left;white-space:normal}
+  .head .pc.buyc{grid-column:2;grid-row:3;text-align:left}
+  .head .pc .none-p{display:none}
+  .head .when{display:none}
   .icon{width:36px;height:36px}
   .nm{gap:10px}
-  .name{font-size:17px}
   .more{padding:2px 4px 12px 4px}
   .more td{font-size:14px;padding-right:8px}
-  html,body{overflow-x:hidden}
-  .count{width:100%;margin:2px 0 0}
-  .tools{position:static}
+  .lvlin input{width:54px}
+  .mlabel{display:inline}
 }
 </style>
 </head>
@@ -123,34 +172,51 @@ i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
     </div>
   </header>
 
-  <div class="tools">
-    <div class="search" id="searchBox">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e7e2d6" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-      <input id="q" type="search" placeholder="Найти: ткань пустоты, сумка, кольцо…" autocomplete="off" enterkeyhint="search">
-      <button id="clear" aria-label="Очистить">×</button>
-    </div>
-    <div class="chips" id="cats"></div>
-    <div class="row2">
-      <button class="chip" id="buyOnly">Только покупают</button>
-      <select id="lvl" aria-label="Уровень">
-        <option value="">Любой уровень</option>
-        <option value="10">до 10 уровня</option><option value="20">до 20 уровня</option>
-        <option value="30">до 30 уровня</option><option value="40">до 40 уровня</option>
-        <option value="50">до 50 уровня</option><option value="60">до 60 уровня</option>
-        <option value="70">до 70 уровня</option>
-      </select>
-      <select id="sort" aria-label="Сортировка">
-        <option value="last">Сначала свежие</option>
-        <option value="hi">Сначала дорогие</option>
-        <option value="lo">Сначала дешёвые</option>
-        <option value="lvl">По уровню</option>
-        <option value="name">По названию</option>
-      </select>
-      <span class="count" id="count"></span>
-    </div>
-  </div>
+  <div class="ah">
+    <button class="catBtn" id="catBtn">Категории: <b id="catNow">Все</b><span>показать ▾</span></button>
+    <nav class="side" id="side" aria-label="Категории"></nav>
 
-  <div class="list" id="list"><div class="empty">Загружаю цены…</div></div>
+    <main>
+      <div class="filters">
+        <div class="f search" id="searchBox">
+          <label for="q">Название</label>
+          <div style="position:relative">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e7e2d6" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="q" type="search" placeholder="ткань пустоты, сумка, кольцо…" autocomplete="off" enterkeyhint="search">
+            <button id="clear" aria-label="Очистить">×</button>
+          </div>
+        </div>
+        <div class="f">
+          <label>Уровень</label>
+          <div class="lvlin"><input id="lmin" type="number" min="1" max="80" inputmode="numeric" placeholder="от"><span>–</span>
+            <input id="lmax" type="number" min="1" max="80" inputmode="numeric" placeholder="до"></div>
+        </div>
+        <div class="f">
+          <label for="rar">Редкость</label>
+          <select id="rar">
+            <option value="0">Все</option>
+            <option value="1">Обычное и выше</option>
+            <option value="2">Необычное и выше</option>
+            <option value="3">Редкое и выше</option>
+            <option value="4">Эпическое</option>
+          </select>
+        </div>
+        <button class="tog" id="buyOnly">Только покупают</button>
+        <button class="reset" id="reset">Сбросить</button>
+      </div>
+
+      <div class="crumbs"><span id="crumb"></span><span id="count"></span></div>
+
+      <div class="cols" id="cols">
+        <button data-sort="q">Редкость</button>
+        <button data-sort="r" class="c">Уровень</button>
+        <button data-sort="sell" class="r">Продают</button>
+        <button data-sort="buy" class="r">Покупают</button>
+        <button data-sort="last" class="r on">Обновлено</button>
+      </div>
+      <div class="list" id="list"><div class="empty">Загружаю цены…</div></div>
+    </main>
+  </div>
 
   <div class="note">Цены собираются автоматически из общего чата хардкор-режима (личные сообщения, гильдия и группа сюда не попадают).
     Это то, что <b>просят и предлагают</b>, а не гарантированная цена сделки. Цена указана за 1 штуку;
@@ -161,20 +227,37 @@ i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
 </div>
 
 <script>
-const CATS = [["all","Все"],["bags","Сумки"],["cloth","Ткань"],["res","Ресурсы"],["weapon","Оружие"],
-  ["armor","Доспехи"],["jewel","Кольца и щиты"],["recipe","Рецепты"],["misc","Прочее"]];
+// --- категории как на аукционе WoW (названия типов приходят из клиента Sirus) ---
+const T_ORDER = ["Оружие","Доспехи","Сумки","Расходуемые","Символы","Хозяйственные товары","Боеприпасы","Колчаны",
+  "Рецепты","Самоцветы","Разное","Задания"];
+const S_ORDER = {
+  "Оружие": ["Одноручные топоры","Двуручные топоры","Луки","Огнестрельное","Одноручное дробящее","Двуручное дробящее",
+    "Древковое","Одноручные мечи","Двуручные мечи","Посохи","Кистевое","Разное","Кинжалы","Метательное","Арбалеты","Жезлы","Удочки"],
+  "Доспехи": ["Разное","Тканевые","Кожаные","Кольчужные","Латные","Щиты"],
+};
+const S_LABEL = {"Тканевые":"Ткань","Кожаные":"Кожа","Кольчужные":"Кольчуга","Латные":"Латы"};
+const SLOT_ORDER = ["INVTYPE_HEAD","INVTYPE_NECK","INVTYPE_SHOULDER","INVTYPE_BODY","INVTYPE_CHEST","INVTYPE_ROBE","INVTYPE_WAIST",
+  "INVTYPE_LEGS","INVTYPE_FEET","INVTYPE_WRIST","INVTYPE_HAND","INVTYPE_FINGER","INVTYPE_TRINKET","INVTYPE_CLOAK",
+  "INVTYPE_HOLDABLE","INVTYPE_SHIELD","INVTYPE_TABARD"];
 const SLOT = {INVTYPE_HEAD:"голова",INVTYPE_NECK:"шея",INVTYPE_SHOULDER:"плечи",INVTYPE_CHEST:"грудь",INVTYPE_ROBE:"грудь",
   INVTYPE_WAIST:"пояс",INVTYPE_LEGS:"ноги",INVTYPE_FEET:"ступни",INVTYPE_WRIST:"запястья",INVTYPE_HAND:"кисти рук",
   INVTYPE_FINGER:"палец",INVTYPE_TRINKET:"аксессуар",INVTYPE_CLOAK:"спина",INVTYPE_SHIELD:"щит",
-  INVTYPE_HOLDABLE:"левая рука",INVTYPE_BAG:"сумка"};
+  INVTYPE_HOLDABLE:"левая рука",INVTYPE_BAG:"сумка",INVTYPE_BODY:"рубашка",INVTYPE_TABARD:"гербовая накидка"};
 const ARMOR = {"Тканевые":"ткань","Кожаные":"кожа","Кольчужные":"кольчуга","Латные":"латы"};
 const SIDES = [["sell","продают"],["buy","покупают"],["deal","сделка"]];
-const st = {q:"", cat:"all", buyOnly:false, lvl:0, sort:"last"};
+const st = {q:"", path:[], buyOnly:false, lmin:0, lmax:0, rar:0, sort:"last", asc:false};
 let DATA = null, STACK = 50, CUR = [];
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm = s => String(s).toLowerCase().replace(/ё/g, "е");
 const med = v => { const s = [...v].sort((a,b)=>a-b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m-1]+s[m]) / 2; };
+// путь предмета в дереве: тип → подтип → (у доспехов) слот
+const T = it => it.t || "Разное";
+const S = it => it.t ? it.s : "Другое";
+const pathOf = it => T(it) === "Доспехи" && it.e ? [T(it), S(it), it.e] : [T(it), S(it)];
+const inPath = (it, p) => p.every((x, i) => pathOf(it)[i] === x);
+const label = (lvl, key) => lvl === 2 ? (SLOT[key] || key).replace(/^./, c => c.toUpperCase()) : lvl === 1 ? (S_LABEL[key] || key) : key;
+const rank = (list, key) => { const i = (list || []).indexOf(key); return i < 0 ? 999 : i; };
 
 function money(g) {
   if (g < 1) return `${Math.max(1, Math.round(g * 100))}<i class="c s"></i>`;
@@ -185,40 +268,39 @@ function span(vals) {
   const lo = Math.min(...vals), hi = Math.max(...vals);
   return hi > lo * 1.05 ? `${money(lo)}<span class="dash">–</span>${money(hi)}` : money(lo);
 }
-// дешёвую ткань и ресурсы продают стаками
-const perStack = it => (it.c === "cloth" || it.c === "res") && med(allPrices(it)) * STACK <= 100;
 const allPrices = it => [...it.sell, ...it.buy, ...it.deal].map(x => x[0]);
+// дешёвую ткань, руду, травы продают стаками; материалы для чар и стихии — поштучно
+const perStack = it => (it.c === "cloth" || it.c === "res") && !["Наложение чар","Стихии"].includes(it.s) &&
+  med(allPrices(it)) * STACK <= 100;
 const mult = it => perStack(it) ? STACK : 1;
-const value = it => { const v = allPrices(it); return v.length ? med(v) : 0; };
 
 function meta(it) {
   if (it.t === "Оружие") return it.s.toLowerCase();
   const slot = SLOT[it.e] || "";
   if (ARMOR[it.s]) return `${ARMOR[it.s]} · ${slot}`;
   if (slot) return slot;
-  return (it.s && it.s !== "Другое" ? it.s : it.t).toLowerCase();
+  return (it.s && it.s !== "Другое" ? it.s : it.t || "без данных из игры").toLowerCase();
 }
 function link(it) {
   if (!it.id) return "";
   const url = it.id > 57000 ? `https://sirus.su/base/item/${it.id}` : `https://www.wowhead.com/wotlk/ru/item=${it.id}`;
   return `<a href="${url}" target="_blank" rel="noopener" title="Описание предмета" onclick="event.stopPropagation()">↗</a>`;
 }
-function priceBlock(it) {
+function side(it, k) {
   const m = mult(it), unit = m > 1 ? '<span class="u">стак</span>' : "";
-  return SIDES.filter(([k]) => it[k].length).map(([k, label]) => {
-    const v = it[k].map(x => x[0] * m), n = new Set(it[k].map(x => x[1])).size;
-    return `<div class="p ${k === "sell" ? "" : k}">${k === "sell" ? "" : `<small>${label}</small>`}${span(v)}${unit}` +
-      (n > 1 ? `<span class="n">×${n}</span>` : "") + "</div>";
-  }).join("");
+  if (!it[k].length) return "";
+  const v = it[k].map(x => x[0] * m), n = new Set(it[k].map(x => x[1])).size;
+  return `${span(v)}${unit}` + (n > 1 ? `<span class="n">×${n}</span>` : "");
 }
 function details(it) {
   const m = mult(it), rows = [];
-  for (const [k, label] of SIDES) for (const [g, who, ts] of [...it[k]].reverse())
-    rows.push([ts, `<tr><td class="side-${k}">${label}</td><td class="side-${k}">${money(g * m)}${m > 1 ? '<span class="u">стак</span>' : ""}</td>` +
-      `<td class="who">${esc(who)}</td><td class="when">${ts.slice(8,10)}.${ts.slice(5,7)} ${ts.slice(11,16)}</td></tr>`]);
+  for (const [k, lbl] of SIDES) for (const [g, who, ts] of [...it[k]].reverse())
+    rows.push([ts, `<tr><td class="side-${k}">${lbl}</td><td class="side-${k}">${money(g * m)}${m > 1 ? '<span class="u">стак</span>' : ""}</td>` +
+      `<td class="who">${esc(who)}</td><td class="dt">${ts.slice(8,10)}.${ts.slice(5,7)} ${ts.slice(11,16)}</td></tr>`]);
   rows.sort((a, b) => a[0] < b[0] ? 1 : -1);
   return `<table>${rows.map(r => r[1]).join("")}</table>`;
 }
+
 // --- подсказка в стиле игры: данные клиента Sirus (аддон), иконки — с CDN Wowhead ---
 const ICON = (name, size) => `https://wow.zamimg.com/images/wow/icons/${size}/${name || "inv_misc_questionmark"}.jpg`;
 const TIP_SLOT = {INVTYPE_HEAD:"Голова",INVTYPE_NECK:"Шея",INVTYPE_SHOULDER:"Плечи",INVTYPE_CHEST:"Грудь",INVTYPE_ROBE:"Грудь",
@@ -268,49 +350,110 @@ function tipHTML(it) {
 
 function row(it, idx) {
   const lv = it.r ? `<span class="lv">${it.r}</span>` : '<span class="lv none">—</span>';
-  return `<div class="item"><div class="head"><div>${lv}</div>` +
+  const sell = side(it, "sell"), buy = side(it, "buy"), deal = side(it, "deal");
+  return `<div class="item"><div class="head">` +
     `<div class="nm" data-i="${idx}"><img class="icon iq${it.q}" src="${ICON(it.i, "medium")}" alt="" loading="lazy">` +
     `<div><div class="name q${it.q}">${esc(it.n)}${link(it)}</div><div class="meta">${esc(meta(it))}</div></div></div>` +
-    `<div class="prices">${priceBlock(it)}</div></div>` +
+    `<div class="lvc">${lv}</div>` +
+    `<div class="pc sellc">${sell ? `<div class="p"><span class="mlabel">продают </span>${sell}</div>` : '<span class="none-p">—</span>'}` +
+    (deal ? `<div class="p deal"><small>сделка</small>${deal}</div>` : "") + `</div>` +
+    `<div class="pc buyc">${buy ? `<div class="p buy"><span class="mlabel">покупают </span>${buy}</div>` : '<span class="none-p">—</span>'}</div>` +
+    `<div class="when">${it.last.slice(8,10)}.${it.last.slice(5,7)} ${it.last.slice(11,16)}</div></div>` +
     `<div class="more"><div class="tt-inline">${tipHTML(it)}</div>${details(it)}</div></div>`;
 }
 
+// --- фильтры, дерево, сортировка ---
 function matches(it, words) {
   if (st.buyOnly && !it.buy.length) return false;
-  if (st.lvl && it.r > st.lvl) return false;
+  if (st.lmin && (it.r || 0) < st.lmin) return false;
+  if (st.lmax && (it.r || 0) > st.lmax) return false;
+  if (st.rar && it.q < st.rar) return false;
   const hay = norm(it.n + " " + meta(it) + " " + it.t + " " + [...it.sell, ...it.buy, ...it.deal].map(x => x[1]).join(" "));
   return words.every(w => hay.includes(w));
 }
+function tree(base) {
+  // узлы: тип → подтип → слот; раскрыта только ветка выбранной категории, как на аукционе
+  const count = p => base.filter(it => inPath(it, p)).length;
+  const keys = (lvl, parent) => [...new Set(base.filter(it => inPath(it, parent) && pathOf(it).length > lvl).map(it => pathOf(it)[lvl]))];
+  const sortKeys = (lvl, parent, ks) => ks.sort((a, b) => lvl === 0 ? rank(T_ORDER, a) - rank(T_ORDER, b) || a.localeCompare(b, "ru")
+    : lvl === 1 ? rank(S_ORDER[parent[0]], a) - rank(S_ORDER[parent[0]], b) || a.localeCompare(b, "ru")
+    : rank(SLOT_ORDER, a) - rank(SLOT_ORDER, b));
+  const btn = (p, lvl, open, hasKids) => {
+    const on = p.length === st.path.length && p.every((x, i) => st.path[i] === x);
+    return `<button class="cat l${lvl}${on ? " on" : ""}" data-path='${esc(JSON.stringify(p))}'>` +
+      `<span class="pm">${hasKids ? (open ? "−" : "+") : ""}</span>${esc(label(lvl, p[lvl]))}<span class="n">${count(p)}</span></button>`;
+  };
+  let html = `<h2>Категории</h2><button class="cat${st.path.length ? "" : " on"}" data-path="[]"><span class="pm"></span>Все<span class="n">${base.length}</span></button>`;
+  for (const t of sortKeys(0, [], keys(0, []))) {
+    const p0 = [t], open0 = st.path[0] === t, kids0 = keys(1, p0);
+    html += btn(p0, 0, open0, kids0.length > 0);
+    if (!open0) continue;
+    for (const s of sortKeys(1, p0, kids0)) {
+      const p1 = [t, s], open1 = st.path[1] === s, kids1 = keys(2, p1);
+      html += btn(p1, 1, open1, kids1.length > 0);
+      if (open1) for (const e of sortKeys(2, p1, kids1)) html += btn([t, s, e], 2, false, false);
+    }
+  }
+  return html;
+}
+const sellKey = it => it.sell.length ? Math.min(...it.sell.map(x => x[0])) * mult(it) : null;
+const buyKey = it => it.buy.length ? Math.max(...it.buy.map(x => x[0])) * mult(it) : null;
+const KEYS = {q: it => it.q, r: it => it.r || 0, sell: sellKey, buy: buyKey, last: it => it.last};
+function sorter(a, b) {
+  const ka = KEYS[st.sort](a), kb = KEYS[st.sort](b);
+  if (ka === null && kb === null) return a.n.localeCompare(b.n, "ru");
+  if (ka === null) return 1;  // без цены — всегда в конце
+  if (kb === null) return -1;
+  const d = ka < kb ? -1 : ka > kb ? 1 : 0;
+  return (st.asc ? d : -d) || a.n.localeCompare(b.n, "ru");
+}
+
 function render() {
   if (!DATA) return;
   // «ткань пустоты» находит и «Сумку из ткани Пустоты»: окончания отрезаются
   const words = norm(st.q).split(/\s+/).filter(Boolean).map(w => w.length > 4 ? w.slice(0, w.length > 6 ? -2 : -1) : w);
   const base = DATA.items.filter(it => matches(it, words));
-  const counts = {all: base.length};
-  for (const it of base) counts[it.c] = (counts[it.c] || 0) + 1;
-  $("cats").innerHTML = CATS.map(([k, label]) =>
-    `<button class="chip${st.cat === k ? " on" : ""}" data-cat="${k}">${label}<b>${counts[k] || 0}</b></button>`).join("");
-  let list = st.cat === "all" ? base : base.filter(it => it.c === st.cat);
-  const by = {
-    last: (a, b) => a.last < b.last ? 1 : -1,
-    hi: (a, b) => value(b) * mult(b) - value(a) * mult(a),
-    lo: (a, b) => value(a) * mult(a) - value(b) * mult(b),
-    lvl: (a, b) => a.r - b.r || a.n.localeCompare(b.n, "ru"),
-    name: (a, b) => a.n.localeCompare(b.n, "ru"),
-  }[st.sort];
-  list = [...list].sort(by);
+  $("side").innerHTML = tree(base);
+  const list = base.filter(it => inPath(it, st.path)).sort(sorter);
   CUR = list;
+  const crumb = st.path.length ? st.path.map((x, i) => label(i, x)).join(" › ") : "Все категории";
+  $("crumb").innerHTML = `<b>${esc(crumb)}</b>`;
+  $("catNow").textContent = st.path.length ? label(st.path.length - 1, st.path[st.path.length - 1]) : "Все";
   $("count").textContent = `Найдено: ${list.length}`;
+  for (const b of $("cols").querySelectorAll("button"))
+    b.className = (b.dataset.sort === "r" ? "c" : ["sell","buy","last"].includes(b.dataset.sort) ? "r" : "") +
+      (b.dataset.sort === st.sort ? " on" + (st.asc ? " asc" : "") : "");
   $("list").innerHTML = list.length ? list.map(row).join("") :
-    `<div class="empty">Ничего не нашлось${st.q ? ` по запросу «${esc(st.q)}»` : ""}. Попробуй другое слово или раздел «Все».</div>`;
+    `<div class="empty">Ничего не нашлось${st.q ? ` по запросу «${esc(st.q)}»` : ""}. Попробуй сбросить фильтры или выбрать «Все».</div>`;
 }
 
 $("q").addEventListener("input", e => { st.q = e.target.value; $("searchBox").classList.toggle("has", !!st.q); render(); });
 $("clear").addEventListener("click", () => { $("q").value = ""; st.q = ""; $("searchBox").classList.remove("has"); render(); $("q").focus(); });
-$("cats").addEventListener("click", e => { const b = e.target.closest("[data-cat]"); if (b) { st.cat = b.dataset.cat; render(); } });
+$("lmin").addEventListener("input", e => { st.lmin = +e.target.value || 0; render(); });
+$("lmax").addEventListener("input", e => { st.lmax = +e.target.value || 0; render(); });
+$("rar").addEventListener("change", e => { st.rar = +e.target.value; render(); });
 $("buyOnly").addEventListener("click", e => { st.buyOnly = !st.buyOnly; e.currentTarget.classList.toggle("on", st.buyOnly); render(); });
-$("lvl").addEventListener("change", e => { st.lvl = +e.target.value || 0; render(); });
-$("sort").addEventListener("change", e => { st.sort = e.target.value; render(); });
+$("reset").addEventListener("click", () => {
+  Object.assign(st, {q:"", path:[], buyOnly:false, lmin:0, lmax:0, rar:0});
+  for (const id of ["q","lmin","lmax"]) $(id).value = "";
+  $("rar").value = "0"; $("buyOnly").classList.remove("on"); $("searchBox").classList.remove("has"); render();
+});
+$("side").addEventListener("click", e => {
+  const b = e.target.closest("[data-path]"); if (!b) return;
+  const p = JSON.parse(b.dataset.path);
+  // повторный клик по открытой категории сворачивает её до родителя
+  st.path = JSON.stringify(p) === JSON.stringify(st.path) && p.length ? p.slice(0, -1) : p;
+  render();
+});
+$("catBtn").addEventListener("click", () => { const s = $("side"); s.classList.toggle("open");
+  $("catBtn").querySelector("span").textContent = s.classList.contains("open") ? "скрыть ▴" : "показать ▾"; });
+$("cols").addEventListener("click", e => {
+  const b = e.target.closest("[data-sort]"); if (!b) return;
+  const k = b.dataset.sort;
+  // как на аукционе: повторный клик меняет направление; цену и уровень логичнее сначала по возрастанию
+  if (st.sort === k) st.asc = !st.asc; else { st.sort = k; st.asc = k === "sell" || k === "r"; }
+  render();
+});
 $("list").addEventListener("click", e => { const h = e.target.closest(".head"); if (h) h.parentElement.classList.toggle("open"); });
 // наведение на иконку или название — подсказка у курсора (на телефоне она показывается в раскрытом товаре)
 if (matchMedia("(hover: hover)").matches) {
