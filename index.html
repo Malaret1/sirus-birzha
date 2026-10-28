@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Биржа хардкора Sirus</title>
+<meta name="description" content="Цены на ткань, сумки, ресурсы и снаряжение из чата хардкор-режима Sirus (Neverest x3). Обновляется автоматически.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23e3b04b' stroke='%238a5a12' stroke-width='3'/></svg>">
+<style>
+:root{
+  --bg:#0f1218; --panel:#161a23; --line:#ffffff12; --zebra:#ffffff06;
+  --text:#e7e2d6; --muted:#8d96a8; --dim:#5d6577; --accent:#e3b04b;
+  --sell:#f3d27a; --buy:#7fd4ff; --deal:#c9b8ff; --ok:#2f6b3a;
+  --q1:#ece8de; --q2:#4fe04f; --q3:#4a9cf0; --q4:#c27cf5; --q5:#ff9a3c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{min-height:100vh;background:radial-gradient(1200px 520px at 0 0,#1f2433 0,var(--bg) 60%) no-repeat,var(--bg);
+  color:var(--text);font:16px/1.4 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:980px;margin:0 auto;padding:28px 16px 40px}
+header{display:flex;align-items:center;gap:16px;border-bottom:2px solid #e3b04b55;padding-bottom:18px}
+.ico{font-size:44px;line-height:1}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(28px,6vw,42px);color:var(--accent);line-height:1.1}
+.sub{color:var(--muted);font-size:15px;margin-top:4px}
+.tools{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 85%,transparent);padding:14px 0 10px;margin-top:4px}
+.search{position:relative}
+.search input{width:100%;font:inherit;font-size:18px;color:var(--text);background:var(--panel);border:1px solid #ffffff1f;
+  border-radius:12px;padding:13px 44px 13px 46px;outline:none}
+.search input::-webkit-search-cancel-button{display:none}
+.search input:focus{border-color:#e3b04b99;box-shadow:0 0 0 3px #e3b04b22}
+.search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);opacity:.55}
+.search button{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--muted);
+  font-size:22px;width:32px;height:32px;cursor:pointer;border-radius:8px;display:none}
+.search.has button{display:block}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;font:inherit;font-size:14px;color:var(--muted);background:#ffffff0a;border:1px solid #ffffff14;border-radius:999px;
+  padding:6px 13px;cursor:pointer;white-space:nowrap}
+.chip b{font-weight:600;color:var(--dim);margin-left:4px}
+.chip.on{color:#0f1218;background:var(--accent);border-color:var(--accent)}
+.chip.on b{color:#0f121899}
+.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-top:8px}
+.row2 select,.row2 .chip{font:inherit;font-size:14px}
+select{color:var(--text);background:#ffffff0a;border:1px solid #ffffff14;border-radius:999px;padding:6px 10px;cursor:pointer}
+select option{background:#161a23}
+.count{margin-left:auto;color:var(--dim);font-size:14px}
+.list{margin-top:6px}
+.item{border-top:1px solid var(--line)}
+.item:nth-child(even) .head{background:var(--zebra)}
+.head{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:12px 10px;cursor:pointer}
+.head:hover{background:#ffffff0c!important}
+.lv{display:inline-block;min-width:42px;text-align:center;font-size:15px;font-weight:700;color:#cfd6e4;background:#ffffff12;
+  border-radius:8px;padding:3px 6px}
+.lv.none{background:none;color:var(--dim)}
+.name{font-size:19px;line-height:1.25}
+.name a{color:var(--dim);text-decoration:none;font-size:14px;margin-left:6px}
+.name a:hover{color:var(--accent)}
+.meta{font-size:14px;color:var(--muted);margin-top:2px}
+.q1{color:var(--q1)}.q2{color:var(--q2)}.q3{color:var(--q3)}.q4{color:var(--q4)}.q5{color:var(--q5)}
+.prices{text-align:right;white-space:nowrap}
+.p{font-weight:700;font-size:18px;color:var(--sell)}
+.p.buy{color:var(--buy);font-size:16px}.p.deal{color:var(--deal);font-size:16px}
+.p small{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.7px;opacity:.75;margin-right:5px}
+.p .n{font-weight:500;font-size:13px;color:var(--muted);margin-left:3px}
+.p .u,.more .u{font-weight:500;font-size:13px;color:var(--muted);margin-left:4px}
+.dash{color:var(--muted);margin:0 3px;font-weight:400}
+i.c{display:inline-block;width:12px;height:12px;border-radius:50%;margin-left:3px;vertical-align:0}
+i.g{background:radial-gradient(circle at 35% 35%,#fff3b0,#e0a92e 55%,#8a5a12)}
+i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
+.more{display:none;padding:2px 10px 14px 74px}
+.item.open .more{display:block}
+.more table{border-collapse:collapse;width:100%;max-width:560px}
+.more td{padding:6px 10px 6px 0;font-size:15px;border-top:1px solid var(--line);white-space:nowrap}
+.more td:nth-child(2){text-align:right;font-weight:700}
+.more td.who{color:var(--text);white-space:normal}
+.more td.when{color:var(--dim);font-size:13px}
+.side-sell{color:var(--sell)}.side-buy{color:var(--buy)}.side-deal{color:var(--deal)}
+.empty{padding:40px 10px;color:var(--muted);text-align:center}
+.note{margin-top:26px;font-size:14px;color:var(--muted);line-height:1.5;border-left:4px solid #e3b04b88;padding:4px 0 4px 14px}
+.foot{margin-top:14px;font-size:13px;color:var(--dim)}
+@media (max-width:640px){
+  .wrap{padding:20px 16px 32px}
+  .ico{font-size:36px}
+  .head{grid-template-columns:44px 1fr;gap:4px 10px;padding:11px 4px}
+  .head .prices{grid-column:2;text-align:left}
+  .lv{min-width:36px;font-size:14px}
+  .name{font-size:17px}
+  .more{padding:2px 4px 12px 4px}
+  .more td{font-size:14px;padding-right:8px}
+  html,body{overflow-x:hidden}
+  .count{width:100%;margin:2px 0 0}
+  .tools{position:static}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="ico">⚖️</div>
+    <div>
+      <h1>Биржа хардкора Sirus</h1>
+      <div class="sub" id="sub">Цены из чата Neverest x3 · загрузка…</div>
+    </div>
+  </header>
+
+  <div class="tools">
+    <div class="search" id="searchBox">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e7e2d6" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="q" type="search" placeholder="Найти: ткань пустоты, сумка, кольцо…" autocomplete="off" enterkeyhint="search">
+      <button id="clear" aria-label="Очистить">×</button>
+    </div>
+    <div class="chips" id="cats"></div>
+    <div class="row2">
+      <button class="chip" id="buyOnly">Только покупают</button>
+      <select id="lvl" aria-label="Уровень">
+        <option value="">Любой уровень</option>
+        <option value="10">до 10 уровня</option><option value="20">до 20 уровня</option>
+        <option value="30">до 30 уровня</option><option value="40">до 40 уровня</option>
+        <option value="50">до 50 уровня</option><option value="60">до 60 уровня</option>
+        <option value="70">до 70 уровня</option>
+      </select>
+      <select id="sort" aria-label="Сортировка">
+        <option value="last">Сначала свежие</option>
+        <option value="hi">Сначала дорогие</option>
+        <option value="lo">Сначала дешёвые</option>
+        <option value="lvl">По уровню</option>
+        <option value="name">По названию</option>
+      </select>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+
+  <div class="list" id="list"><div class="empty">Загружаю цены…</div></div>
+
+  <div class="note">Цены собираются автоматически из общего чата хардкор-режима (личные сообщения, гильдия и группа сюда не попадают).
+    Это то, что <b>просят и предлагают</b>, а не гарантированная цена сделки. Цена указана за 1 штуку;
+    у ткани и ресурсов — за стак (<span id="stackN">50</span> штук). Повтор одного объявления считается один раз.
+    Нажми на товар, чтобы увидеть, кто и когда называл цену.</div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+const CATS = [["all","Все"],["bags","Сумки"],["cloth","Ткань"],["res","Ресурсы"],["weapon","Оружие"],
+  ["armor","Доспехи"],["jewel","Кольца и щиты"],["recipe","Рецепты"],["misc","Прочее"]];
+const SLOT = {INVTYPE_HEAD:"голова",INVTYPE_NECK:"шея",INVTYPE_SHOULDER:"плечи",INVTYPE_CHEST:"грудь",INVTYPE_ROBE:"грудь",
+  INVTYPE_WAIST:"пояс",INVTYPE_LEGS:"ноги",INVTYPE_FEET:"ступни",INVTYPE_WRIST:"запястья",INVTYPE_HAND:"кисти рук",
+  INVTYPE_FINGER:"палец",INVTYPE_TRINKET:"аксессуар",INVTYPE_CLOAK:"спина",INVTYPE_SHIELD:"щит",
+  INVTYPE_HOLDABLE:"левая рука",INVTYPE_BAG:"сумка"};
+const ARMOR = {"Тканевые":"ткань","Кожаные":"кожа","Кольчужные":"кольчуга","Латные":"латы"};
+const SIDES = [["sell","продают"],["buy","покупают"],["deal","сделка"]];
+const st = {q:"", cat:"all", buyOnly:false, lvl:0, sort:"last"};
+let DATA = null, STACK = 50;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s).toLowerCase().replace(/ё/g, "е");
+const med = v => { const s = [...v].sort((a,b)=>a-b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m-1]+s[m]) / 2; };
+
+function money(g) {
+  if (g < 1) return `${Math.max(1, Math.round(g * 100))}<i class="c s"></i>`;
+  const v = Math.round(g * 10) / 10;
+  return v.toLocaleString("ru-RU", {maximumFractionDigits: 1}) + '<i class="c g"></i>';
+}
+function span(vals) {
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  return hi > lo * 1.05 ? `${money(lo)}<span class="dash">–</span>${money(hi)}` : money(lo);
+}
+// дешёвую ткань и ресурсы продают стаками
+const perStack = it => (it.c === "cloth" || it.c === "res") && med(allPrices(it)) * STACK <= 100;
+const allPrices = it => [...it.sell, ...it.buy, ...it.deal].map(x => x[0]);
+const mult = it => perStack(it) ? STACK : 1;
+const value = it => { const v = allPrices(it); return v.length ? med(v) : 0; };
+
+function meta(it) {
+  if (it.t === "Оружие") return it.s.toLowerCase();
+  const slot = SLOT[it.e] || "";
+  if (ARMOR[it.s]) return `${ARMOR[it.s]} · ${slot}`;
+  if (slot) return slot;
+  return (it.s && it.s !== "Другое" ? it.s : it.t).toLowerCase();
+}
+function link(it) {
+  if (!it.id) return "";
+  const url = it.id > 57000 ? `https://sirus.su/base/item/${it.id}` : `https://www.wowhead.com/wotlk/ru/item=${it.id}`;
+  return `<a href="${url}" target="_blank" rel="noopener" title="Описание предмета" onclick="event.stopPropagation()">↗</a>`;
+}
+function priceBlock(it) {
+  const m = mult(it), unit = m > 1 ? '<span class="u">стак</span>' : "";
+  return SIDES.filter(([k]) => it[k].length).map(([k, label]) => {
+    const v = it[k].map(x => x[0] * m), n = new Set(it[k].map(x => x[1])).size;
+    return `<div class="p ${k === "sell" ? "" : k}">${k === "sell" ? "" : `<small>${label}</small>`}${span(v)}${unit}` +
+      (n > 1 ? `<span class="n">×${n}</span>` : "") + "</div>";
+  }).join("");
+}
+function details(it) {
+  const m = mult(it), rows = [];
+  for (const [k, label] of SIDES) for (const [g, who, ts] of [...it[k]].reverse())
+    rows.push([ts, `<tr><td class="side-${k}">${label}</td><td class="side-${k}">${money(g * m)}${m > 1 ? '<span class="u">стак</span>' : ""}</td>` +
+      `<td class="who">${esc(who)}</td><td class="when">${ts.slice(8,10)}.${ts.slice(5,7)} ${ts.slice(11,16)}</td></tr>`]);
+  rows.sort((a, b) => a[0] < b[0] ? 1 : -1);
+  return `<table>${rows.map(r => r[1]).join("")}</table>`;
+}
+function row(it) {
+  const lv = it.r ? `<span class="lv">${it.r}</span>` : '<span class="lv none">—</span>';
+  return `<div class="item"><div class="head"><div>${lv}</div>` +
+    `<div><div class="name q${it.q}">${esc(it.n)}${link(it)}</div><div class="meta">${esc(meta(it))}</div></div>` +
+    `<div class="prices">${priceBlock(it)}</div></div><div class="more">${details(it)}</div></div>`;
+}
+
+function matches(it, words) {
+  if (st.buyOnly && !it.buy.length) return false;
+  if (st.lvl && it.r > st.lvl) return false;
+  const hay = norm(it.n + " " + meta(it) + " " + it.t + " " + [...it.sell, ...it.buy, ...it.deal].map(x => x[1]).join(" "));
+  return words.every(w => hay.includes(w));
+}
+function render() {
+  if (!DATA) return;
+  // «ткань пустоты» находит и «Сумку из ткани Пустоты»: окончания отрезаются
+  const words = norm(st.q).split(/\s+/).filter(Boolean).map(w => w.length > 4 ? w.slice(0, w.length > 6 ? -2 : -1) : w);
+  const base = DATA.items.filter(it => matches(it, words));
+  const counts = {all: base.length};
+  for (const it of base) counts[it.c] = (counts[it.c] || 0) + 1;
+  $("cats").innerHTML = CATS.map(([k, label]) =>
+    `<button class="chip${st.cat === k ? " on" : ""}" data-cat="${k}">${label}<b>${counts[k] || 0}</b></button>`).join("");
+  let list = st.cat === "all" ? base : base.filter(it => it.c === st.cat);
+  const by = {
+    last: (a, b) => a.last < b.last ? 1 : -1,
+    hi: (a, b) => value(b) * mult(b) - value(a) * mult(a),
+    lo: (a, b) => value(a) * mult(a) - value(b) * mult(b),
+    lvl: (a, b) => a.r - b.r || a.n.localeCompare(b.n, "ru"),
+    name: (a, b) => a.n.localeCompare(b.n, "ru"),
+  }[st.sort];
+  list = [...list].sort(by);
+  $("count").textContent = `Найдено: ${list.length}`;
+  $("list").innerHTML = list.length ? list.map(row).join("") :
+    `<div class="empty">Ничего не нашлось${st.q ? ` по запросу «${esc(st.q)}»` : ""}. Попробуй другое слово или раздел «Все».</div>`;
+}
+
+$("q").addEventListener("input", e => { st.q = e.target.value; $("searchBox").classList.toggle("has", !!st.q); render(); });
+$("clear").addEventListener("click", () => { $("q").value = ""; st.q = ""; $("searchBox").classList.remove("has"); render(); $("q").focus(); });
+$("cats").addEventListener("click", e => { const b = e.target.closest("[data-cat]"); if (b) { st.cat = b.dataset.cat; render(); } });
+$("buyOnly").addEventListener("click", e => { st.buyOnly = !st.buyOnly; e.currentTarget.classList.toggle("on", st.buyOnly); render(); });
+$("lvl").addEventListener("change", e => { st.lvl = +e.target.value || 0; render(); });
+$("sort").addEventListener("change", e => { st.sort = e.target.value; render(); });
+$("list").addEventListener("click", e => { const h = e.target.closest(".head"); if (h) h.parentElement.classList.toggle("open"); });
+
+fetch("prices.json?t=" + Date.now()).then(r => r.json()).then(d => {
+  DATA = d; STACK = d.stack || 50; $("stackN").textContent = STACK;
+  const [date, time] = d.updated.split(" ");
+  $("sub").textContent = `Цены из чата Neverest x3 · обновлено ${date.slice(8,10)}.${date.slice(5,7)} в ${time} по Москве`;
+  $("foot").textContent = `${d.items.length} товаров за последние ${d.days} дней`;
+  render();
+}).catch(() => { $("list").innerHTML = '<div class="empty">Не удалось загрузить цены. Обнови страницу чуть позже.</div>'; });
+</script>
+</body>
+</html>
