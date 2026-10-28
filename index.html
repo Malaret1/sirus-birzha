@@ -53,6 +53,23 @@ select option{background:#161a23}
 .lv{display:inline-block;min-width:42px;text-align:center;font-size:15px;font-weight:700;color:#cfd6e4;background:#ffffff12;
   border-radius:8px;padding:3px 6px}
 .lv.none{background:none;color:var(--dim)}
+.nm{display:flex;align-items:center;gap:12px;min-width:0}
+.icon{flex:none;width:40px;height:40px;border-radius:6px;border:2px solid #4a4a52;box-shadow:0 0 0 1px #000;background:#000}
+.icon.iq0{border-color:#9d9d9d66}.icon.iq2{border-color:#1eff0099}.icon.iq3{border-color:#0070ddcc}
+.icon.iq4{border-color:#a335eecc}.icon.iq5{border-color:#ff8000cc}
+/* подсказка как в игре */
+#tip{position:fixed;z-index:50;pointer-events:none;display:none}
+.tt{display:flex;gap:6px;align-items:flex-start;max-width:400px}
+.tt img{flex:none;width:52px;height:52px;border-radius:6px;border:2px solid #4a4a52;box-shadow:0 0 0 1px #000;background:#000}
+.tt .box{background:rgba(9,11,30,.96);border:2px solid #8e8e96;border-radius:6px;box-shadow:0 0 0 1px #000,0 10px 30px #000b;
+  padding:7px 10px 8px;font:14px/1.4 "Trebuchet MS",Arial,sans-serif;color:#fff;min-width:210px}
+.tt .t{font-size:16px}
+.tt .tq0{color:#9d9d9d}.tt .tq1{color:#fff}.tt .tq2{color:#1eff00}.tt .tq3{color:#0070dd}.tt .tq4{color:#a335ee}.tt .tq5{color:#ff8000}
+.tt .y{color:#ffd100}.tt .gr{color:#1eff00}.tt .so{color:#9d9d9d}
+.tt .lr{display:flex;justify-content:space-between;gap:18px}
+.tt .src{color:#7f8494;font-size:12px;margin-top:6px}
+.tt-inline{display:none;margin:4px 0 12px}
+@media (hover:none){.tt-inline{display:block}}
 .name{font-size:19px;line-height:1.25}
 .name a{color:var(--dim);text-decoration:none;font-size:14px;margin-left:6px}
 .name a:hover{color:var(--accent)}
@@ -85,6 +102,8 @@ i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
   .head{grid-template-columns:44px 1fr;gap:4px 10px;padding:11px 4px}
   .head .prices{grid-column:2;text-align:left}
   .lv{min-width:36px;font-size:14px}
+  .icon{width:36px;height:36px}
+  .nm{gap:10px}
   .name{font-size:17px}
   .more{padding:2px 4px 12px 4px}
   .more td{font-size:14px;padding-right:8px}
@@ -136,8 +155,9 @@ i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
   <div class="note">Цены собираются автоматически из общего чата хардкор-режима (личные сообщения, гильдия и группа сюда не попадают).
     Это то, что <b>просят и предлагают</b>, а не гарантированная цена сделки. Цена указана за 1 штуку;
     у ткани и ресурсов — за стак (<span id="stackN">50</span> штук). Повтор одного объявления считается один раз.
-    Нажми на товар, чтобы увидеть, кто и когда называл цену.</div>
+    Наведи на товар — покажется описание из игры; нажми — увидишь, кто и когда называл цену.</div>
   <div class="foot" id="foot"></div>
+  <div id="tip"></div>
 </div>
 
 <script>
@@ -150,7 +170,7 @@ const SLOT = {INVTYPE_HEAD:"голова",INVTYPE_NECK:"шея",INVTYPE_SHOULDER
 const ARMOR = {"Тканевые":"ткань","Кожаные":"кожа","Кольчужные":"кольчуга","Латные":"латы"};
 const SIDES = [["sell","продают"],["buy","покупают"],["deal","сделка"]];
 const st = {q:"", cat:"all", buyOnly:false, lvl:0, sort:"last"};
-let DATA = null, STACK = 50;
+let DATA = null, STACK = 50, CUR = [];
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm = s => String(s).toLowerCase().replace(/ё/g, "е");
@@ -199,11 +219,60 @@ function details(it) {
   rows.sort((a, b) => a[0] < b[0] ? 1 : -1);
   return `<table>${rows.map(r => r[1]).join("")}</table>`;
 }
-function row(it) {
+// --- подсказка в стиле игры: данные клиента Sirus (аддон), иконки — с CDN Wowhead ---
+const ICON = (name, size) => `https://wow.zamimg.com/images/wow/icons/${size}/${name || "inv_misc_questionmark"}.jpg`;
+const TIP_SLOT = {INVTYPE_HEAD:"Голова",INVTYPE_NECK:"Шея",INVTYPE_SHOULDER:"Плечи",INVTYPE_CHEST:"Грудь",INVTYPE_ROBE:"Грудь",
+  INVTYPE_WAIST:"Пояс",INVTYPE_LEGS:"Ноги",INVTYPE_FEET:"Ступни",INVTYPE_WRIST:"Запястья",INVTYPE_HAND:"Кисти рук",
+  INVTYPE_FINGER:"Палец",INVTYPE_TRINKET:"Аксессуар",INVTYPE_CLOAK:"Спина",INVTYPE_WEAPON:"Одноручное",
+  INVTYPE_2HWEAPON:"Двуручное",INVTYPE_WEAPONMAINHAND:"Правая рука",INVTYPE_WEAPONOFFHAND:"Левая рука",
+  INVTYPE_SHIELD:"Левая рука",INVTYPE_HOLDABLE:"Левая рука",INVTYPE_RANGED:"Дальний бой",INVTYPE_RANGEDRIGHT:"Дальний бой",
+  INVTYPE_THROWN:"Метательное",INVTYPE_RELIC:"Реликвия",INVTYPE_BODY:"Рубашка",INVTYPE_TABARD:"Гербовая накидка",INVTYPE_BAG:"Сумка"};
+const TIP_SUB = {"Тканевые":"Ткань","Кожаные":"Кожа","Кольчужные":"Кольчуга","Латные":"Латы","Щиты":"Щит","Кинжалы":"Кинжал",
+  "Посохи":"Посох","Луки":"Лук","Арбалеты":"Арбалет","Жезлы":"Жезл","Одноручные мечи":"Меч","Двуручные мечи":"Меч",
+  "Одноручные топоры":"Топор","Двуручные топоры":"Топор","Одноручное дробящее":"Дробящее","Двуручное дробящее":"Дробящее",
+  "Древковое":"Древковое","Кистевое":"Кистевое","Огнестрельное":"Огнестрельное","Разное":""};
+const PRIMARY = [["STRENGTH","к силе"],["AGILITY","к ловкости"],["STAMINA","к выносливости"],["INTELLECT","к интеллекту"],["SPIRIT","к духу"],
+  ["RESISTANCE6_NAME","к сопротивлению тайной магии"],["RESISTANCE2_NAME","к сопротивлению огню"],
+  ["RESISTANCE3_NAME","к сопротивлению силам природы"],["RESISTANCE4_NAME","к сопротивлению магии льда"],
+  ["RESISTANCE5_NAME","к сопротивлению темной магии"]];
+const SOCKETS = {EMPTY_SOCKET_RED:"Красное гнездо",EMPTY_SOCKET_YELLOW:"Желтое гнездо",EMPTY_SOCKET_BLUE:"Синее гнездо",
+  EMPTY_SOCKET_META:"Особое гнездо",EMPTY_SOCKET_PRISMATIC:"Бесцветное гнездо"};
+const GREEN = {SPELL_POWER:"Увеличивает силу заклинаний на %.",ATTACK_POWER:"Увеличивает силу атаки на %.",
+  FERAL_ATTACK_POWER:"Увеличивает силу атаки на % в облике кошки, медведя, лютого медведя и лунного совуха.",
+  CRIT_RATING:"Повышает рейтинг критического удара на %.",HIT_RATING:"Повышает рейтинг меткости на %.",
+  HASTE_RATING:"Повышает рейтинг скорости на %.",EXPERTISE_RATING:"Повышает рейтинг мастерства на %.",
+  ARMOR_PENETRATION_RATING:"Повышает рейтинг пробивания брони на %.",DEFENSE_SKILL_RATING:"Повышает рейтинг защиты на %.",
+  DODGE_RATING:"Повышает рейтинг уклонения на %.",PARRY_RATING:"Повышает рейтинг парирования на %.",
+  BLOCK_RATING:"Повышает рейтинг блокирования щитом на %.",RESILIENCE_RATING:"Повышает рейтинг устойчивости на %.",
+  POWER_REGEN0:"Восполняет % ед. маны раз в 5 сек."};
+const num = v => (+v).toLocaleString("ru-RU", {maximumFractionDigits: 1});
+
+function tipHTML(it) {
+  const s = {};
+  for (const kv of (it.st || "").split(",")) { const [k, v] = kv.split("="); if (k) s[k] = v; }
+  const L = [`<div class="t tq${it.q}">${esc(it.n)}</div>`];
+  if (it.il && it.t) L.push(`<div class="y">Уровень предмета: ${it.il}</div>`);
+  const slot = TIP_SLOT[it.e], sub = TIP_SUB[it.s] ?? it.s;
+  if (slot) L.push(`<div class="lr"><span>${slot}</span><span>${esc(slot === "Сумка" ? "" : sub)}</span></div>`);
+  else if (it.t) L.push(`<div>${esc(it.s && it.s !== "Другое" ? it.s : it.t)}</div>`);
+  if (s.DAMAGE_PER_SECOND) L.push(`<div>(${num(s.DAMAGE_PER_SECOND)} ед. урона в секунду)</div>`);
+  if (s.RESISTANCE0_NAME) L.push(`<div>Броня: ${num(s.RESISTANCE0_NAME)}</div>`);
+  if (s.BLOCK_VALUE) L.push(`<div>Блок: ${num(s.BLOCK_VALUE)}</div>`);
+  for (const [k, text] of PRIMARY) if (s[k]) L.push(`<div>+${num(s[k])} ${text}</div>`);
+  for (const [k, text] of Object.entries(SOCKETS)) if (s[k]) L.push(`<div class="so">${text}</div>`);
+  if (it.r) L.push(`<div>Требуется уровень: ${it.r}</div>`);
+  for (const [k, text] of Object.entries(GREEN)) if (s[k]) L.push(`<div class="gr">Если на персонаже: ${text.replace("%", num(s[k]))}</div>`);
+  L.push(`<div class="src">${it.t ? "Данные из клиента Sirus" : "Нет данных из игры"}</div>`);
+  return `<div class="tt"><img src="${ICON(it.i, "large")}" alt=""><div class="box">${L.join("")}</div></div>`;
+}
+
+function row(it, idx) {
   const lv = it.r ? `<span class="lv">${it.r}</span>` : '<span class="lv none">—</span>';
   return `<div class="item"><div class="head"><div>${lv}</div>` +
-    `<div><div class="name q${it.q}">${esc(it.n)}${link(it)}</div><div class="meta">${esc(meta(it))}</div></div>` +
-    `<div class="prices">${priceBlock(it)}</div></div><div class="more">${details(it)}</div></div>`;
+    `<div class="nm" data-i="${idx}"><img class="icon iq${it.q}" src="${ICON(it.i, "medium")}" alt="" loading="lazy">` +
+    `<div><div class="name q${it.q}">${esc(it.n)}${link(it)}</div><div class="meta">${esc(meta(it))}</div></div></div>` +
+    `<div class="prices">${priceBlock(it)}</div></div>` +
+    `<div class="more"><div class="tt-inline">${tipHTML(it)}</div>${details(it)}</div></div>`;
 }
 
 function matches(it, words) {
@@ -230,6 +299,7 @@ function render() {
     name: (a, b) => a.n.localeCompare(b.n, "ru"),
   }[st.sort];
   list = [...list].sort(by);
+  CUR = list;
   $("count").textContent = `Найдено: ${list.length}`;
   $("list").innerHTML = list.length ? list.map(row).join("") :
     `<div class="empty">Ничего не нашлось${st.q ? ` по запросу «${esc(st.q)}»` : ""}. Попробуй другое слово или раздел «Все».</div>`;
@@ -242,6 +312,24 @@ $("buyOnly").addEventListener("click", e => { st.buyOnly = !st.buyOnly; e.curren
 $("lvl").addEventListener("change", e => { st.lvl = +e.target.value || 0; render(); });
 $("sort").addEventListener("change", e => { st.sort = e.target.value; render(); });
 $("list").addEventListener("click", e => { const h = e.target.closest(".head"); if (h) h.parentElement.classList.toggle("open"); });
+// наведение на иконку или название — подсказка у курсора (на телефоне она показывается в раскрытом товаре)
+if (matchMedia("(hover: hover)").matches) {
+  const tip = $("tip");
+  const place = e => {
+    const r = tip.getBoundingClientRect(), pad = 16;
+    let x = e.clientX + 18, y = e.clientY + 18;
+    if (x + r.width > innerWidth - pad) x = e.clientX - r.width - 14;
+    if (y + r.height > innerHeight - pad) y = Math.max(pad, innerHeight - r.height - pad);
+    tip.style.left = Math.max(pad, x) + "px"; tip.style.top = y + "px";
+  };
+  $("list").addEventListener("mouseover", e => {
+    const nm = e.target.closest(".nm");
+    if (!nm || e.target.closest("a")) { tip.style.display = "none"; return; }
+    tip.innerHTML = tipHTML(CUR[+nm.dataset.i]); tip.style.display = "block"; place(e);
+  });
+  $("list").addEventListener("mousemove", e => { if (tip.style.display === "block") place(e); });
+  $("list").addEventListener("mouseleave", () => { tip.style.display = "none"; });
+}
 
 fetch("prices.json?t=" + Date.now()).then(r => r.json()).then(d => {
   DATA = d; STACK = d.stack || 50; $("stackN").textContent = STACK;
