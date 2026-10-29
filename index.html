@@ -302,7 +302,16 @@ function details(it) {
 }
 
 // --- подсказка в стиле игры: данные клиента Sirus (аддон), иконки — с CDN Wowhead ---
-const ICON = (name, size) => `https://wow.zamimg.com/images/wow/icons/${size}/${name || "inv_misc_questionmark"}.jpg`;
+// Иконки лежат на самом сайте (Биржа копирует их с сервера Blizzard); ещё не скопированная — прямо оттуда.
+const ZAM = name => `https://render.worldofwarcraft.com/us/icons/56/${name || "inv_misc_questionmark"}.jpg`;
+const ICON = name => name ? `icons/${name}.jpg` : ZAM(name);
+document.addEventListener("error", e => {
+  const img = e.target;
+  if (img.tagName === "IMG" && !img.dataset.zam && img.src.includes("/icons/")) {
+    img.dataset.zam = 1;
+    img.src = ZAM(img.src.split("/").pop().replace(".jpg", ""));
+  }
+}, true);
 const TIP_SLOT = {INVTYPE_HEAD:"Голова",INVTYPE_NECK:"Шея",INVTYPE_SHOULDER:"Плечи",INVTYPE_CHEST:"Грудь",INVTYPE_ROBE:"Грудь",
   INVTYPE_WAIST:"Пояс",INVTYPE_LEGS:"Ноги",INVTYPE_FEET:"Ступни",INVTYPE_WRIST:"Запястья",INVTYPE_HAND:"Кисти рук",
   INVTYPE_FINGER:"Палец",INVTYPE_TRINKET:"Аксессуар",INVTYPE_CLOAK:"Спина",INVTYPE_WEAPON:"Одноручное",
