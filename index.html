@@ -125,6 +125,7 @@ i.s{background:radial-gradient(circle at 35% 35%,#fff,#b9c0c9 55%,#6a7280)}
 .tt .tq0{color:#9d9d9d}.tt .tq1{color:#fff}.tt .tq2{color:#1eff00}.tt .tq3{color:#0070dd}.tt .tq4{color:#a335ee}.tt .tq5{color:#ff8000}
 .tt .y{color:#ffd100}.tt .gr{color:#1eff00}.tt .so{color:#9d9d9d}
 .tt .lr{display:flex;justify-content:space-between;gap:18px}
+.tt .lr span:last-child{white-space:nowrap}
 .tt .src{color:#7f8494;font-size:12px;margin-top:6px}
 .tt-inline{display:none;margin:4px 0 12px}
 @media (hover:none){.tt-inline{display:block}}
@@ -338,7 +339,22 @@ const GREEN = {SPELL_POWER:"Увеличивает силу заклинаний
   POWER_REGEN0:"Восполняет % ед. маны раз в 5 сек."};
 const num = v => (+v).toLocaleString("ru-RU", {maximumFractionDigits: 1});
 
+// Подсказка целиком, как в игре: строки [цвет, слева, цвет, справа] — из клиента Sirus или с Wowhead.
+// Красный (не подходит персонажу, который видел предмет) — белым: сайт смотрят и другие.
+const tcol = c => /^[0-9a-f]{6}$/.test(c) && !/^ff[0-3][0-9a-f][0-3][0-9a-f]$/.test(c) ? c : "ffffff";
+function fullTip(it) {
+  const L = [`<div class="t tq${it.q}">${esc(it.n)}</div>`];
+  if (it.il && !it.tt.some(l => l[1].startsWith("Уровень предмета"))) L.push(`<div class="y">Уровень предмета: ${it.il}</div>`);
+  for (const [lc, lt, rc, rt] of it.tt) {
+    const span = (c, t) => `<span style="color:#${tcol(c)}">${esc(t)}</span>`;
+    L.push(rt ? `<div class="lr">${span(lc, lt)}${span(rc, rt)}</div>` : `<div>${span(lc, lt)}</div>`);
+  }
+  L.push(`<div class="src">${it.ts === "sirus" ? "Данные из клиента Sirus" : "Описание с Wowhead (WotLK 3.3.5)"}</div>`);
+  return `<div class="tt"><img src="${ICON(it.i)}" alt=""><div class="box">${L.join("")}</div></div>`;
+}
+
 function tipHTML(it) {
+  if (it.tt && it.tt.some(l => !l[1].startsWith("Уровень предмета"))) return fullTip(it);
   const s = {};
   for (const kv of (it.st || "").split(",")) { const [k, v] = kv.split("="); if (k) s[k] = v; }
   const L = [`<div class="t tq${it.q}">${esc(it.n)}</div>`];
